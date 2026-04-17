@@ -42,7 +42,6 @@
     background-image: radial-gradient(circle at 50% 50%, rgba(58, 92, 204, 0.02) 0%, transparent 80%);
   }
 
-  /* === HEADER ÉPURÉ === */
   header {
     position: sticky;
     top: 0;
@@ -54,15 +53,10 @@
     height: 70px;
     display: flex;
     align-items: center;
-    justify-content: flex-end; /* Pousse tout vers la droite */
+    justify-content: flex-end;
   }
 
-  /* Titre centré ou à gauche selon ta préférence, ici on le laisse respirer */
-  .header-title-container {
-    position: absolute;
-    left: 2rem;
-  }
-
+  .header-title-container { position: absolute; left: 2rem; }
   .header-title-container h1 {
     font-family: var(--font-title);
     font-size: 16px;
@@ -82,9 +76,7 @@
     cursor: pointer;
     transition: 0.3s;
   }
-  #admin-btn:hover { background: rgba(194,156,82,0.1); color: #fff; }
 
-  /* === RESTE DU STYLE === */
   main { max-width: 1200px; margin: 0 auto; padding: 2.5rem 2rem; }
   .section-header { display: flex; align-items: center; gap: 15px; margin-bottom: 2rem; }
   .section-title { font-family: var(--font-title); letter-spacing: 4px; text-transform: uppercase; font-size: 12px; color: var(--text2); }
@@ -92,8 +84,7 @@
 
   .missions-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
   .mission-card { background: var(--bg2); border: 1px solid var(--border); border-top: 3px solid var(--card-color, var(--gold)); border-radius: 4px; transition: 0.3s; }
-  .mission-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-
+  
   .diff-Classe-4 { --card-color: var(--c-classe-4); }
   .diff-Classe-3 { --card-color: var(--c-classe-3); }
   .diff-Classe-2 { --card-color: var(--c-classe-2); }
@@ -117,11 +108,11 @@
   #admin-panel { display: none; background: var(--bg2); padding: 2rem; border-bottom: 1px solid var(--border-gold); }
   #admin-panel.open { display: block; }
 
-  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); z-index: 1000; align-items: center; justify-content: center; }
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 1000; align-items: center; justify-content: center; }
   .modal-overlay.open { display: flex; }
   .modal { background: var(--bg2); border: 1px solid var(--border-gold); padding: 2rem; width: 400px; }
 
-  input, textarea, select { width: 100%; background: var(--bg3); border: 1px solid var(--border); color: #fff; padding: 12px; margin-bottom: 10px; }
+  input, textarea, select { width: 100%; background: var(--bg3); border: 1px solid var(--border); color: #fff; padding: 12px; margin-bottom: 10px; outline: none; }
   .toast { position: fixed; bottom: 20px; right: 20px; padding: 15px; background: var(--bg2); border: 1px solid var(--gold); opacity: 0; transition: 0.3s; z-index: 2000; }
   .toast.show { opacity: 1; transform: translateY(-10px); }
 </style>
@@ -132,12 +123,12 @@
   <div class="header-title-container">
     <h1>Registre des Missions</h1>
   </div>
-  <button id="admin-btn" onclick="openPwd()">Accès Admin</button>
+  <button id="admin-btn" onclick="openPwd()">Admin</button>
 </header>
 
 <div id="admin-panel">
   <div class="admin-form">
-    <input type="text" id="m-titre" placeholder="Titre de la mission..."/>
+    <input type="text" id="m-titre" placeholder="Titre de l'ordre..."/>
     <textarea id="m-desc" placeholder="Détails de la mission..."></textarea>
     <select id="m-diff">
       <option value="Classe 4">Classe 4</option>
@@ -156,33 +147,43 @@
 
 <main>
   <div class="section-header">
-    <span class="section-title">Missions en cours</span>
+    <span class="section-title">Ordres d'Exorcisme</span>
     <div class="divider"></div>
     <span id="mission-count" style="font-size: 11px; color: var(--gold);">0 mission</span>
   </div>
   <div class="missions-grid" id="missions-grid"></div>
 </main>
 
+<div class="modal-overlay" id="modal-welcome">
+  <div class="modal">
+    <h3 style="font-family: var(--font-title); color: var(--gold); text-align: center; margin-bottom: 10px;">Identification</h3>
+    <p style="font-size: 12px; color: var(--text2); text-align: center; margin-bottom: 20px;">Déclinez votre nom pour accéder au registre.</p>
+    <input type="text" id="user-session-name" placeholder="Prénom Nom" />
+    <button onclick="saveUserSession()" style="width:100%; padding: 12px; background: var(--gold); color: #000; border: none; font-weight: bold; cursor: pointer;">Accéder</button>
+  </div>
+</div>
+
 <div class="modal-overlay" id="modal-inscription">
   <div class="modal">
-    <h3 style="font-family: var(--font-title); color: var(--gold); margin-bottom: 20px; text-align: center;">Affectation</h3>
-    <input type="text" id="insc-pseudo" placeholder="Votre nom" />
+    <h3 style="font-family: var(--font-title); color: var(--gold); text-align: center; margin-bottom: 10px;">Affectation</h3>
+    <p style="text-align: center; font-size: 13px; margin-bottom: 20px;">Exorciste : <span id="display-user-name" style="color: #fff; font-weight: bold;"></span></p>
+    <label style="font-size: 10px; color: var(--text2); text-transform: uppercase;">Rôle</label>
     <select id="insc-role">
       <option value="Élève">Élève</option>
       <option value="Professeur">Professeur / Encadrant</option>
     </select>
-    <div style="display: flex; gap: 10px;">
-      <button onclick="closeModal()" style="flex:1; background:none; border:1px solid var(--border); color:var(--text2);">Annuler</button>
-      <button onclick="confirmerInscription()" style="flex:1; background:var(--gold); color:#000; border:none; font-weight:bold;">Valider</button>
+    <div style="display: flex; gap: 10px; margin-top: 10px;">
+      <button onclick="closeModal()" style="flex:1; background:none; border:1px solid var(--border); color:var(--text2); cursor: pointer;">Annuler</button>
+      <button onclick="confirmerInscription()" style="flex:1; background:var(--gold); color:#000; border:none; font-weight:bold; cursor: pointer;">Confirmer</button>
     </div>
   </div>
 </div>
 
 <div id="pwd-overlay" class="modal-overlay">
   <div class="modal">
-    <h3 style="font-family: var(--font-title); text-align:center; margin-bottom:15px;">Identification</h3>
+    <h3 style="font-family: var(--font-title); text-align:center; margin-bottom:15px;">Identification Admin</h3>
     <input type="password" id="pwd-input" placeholder="Mot de passe" />
-    <button onclick="checkPwd()" style="width:100%; padding:10px; background:var(--gold); border:none; font-weight:bold;">Vérifier</button>
+    <button onclick="checkPwd()" style="width:100%; padding:10px; background:var(--gold); border:none; font-weight:bold; cursor: pointer;">Entrer</button>
   </div>
 </div>
 
@@ -200,6 +201,25 @@ let missions = [];
 let inscriptions = [];
 let currentMissionId = null;
 let isAdmin = false;
+let currentUserName = localStorage.getItem('jjk_user_name');
+
+// --- SESSION LOGIC ---
+async function initSession() {
+  if (!currentUserName) {
+    document.getElementById('modal-welcome').classList.add('open');
+  }
+  loadData();
+}
+
+function saveUserSession() {
+  const name = document.getElementById('user-session-name').value.trim();
+  if (name) {
+    localStorage.setItem('jjk_user_name', name);
+    currentUserName = name;
+    document.getElementById('modal-welcome').classList.remove('open');
+    showToast("Bienvenue, Exorciste " + name);
+  }
+}
 
 async function loadData() {
   const [{ data: m }, { data: i }] = await Promise.all([
@@ -235,60 +255,73 @@ function renderMissions() {
             <span class="mission-title">${m.titre}</span>
             <span class="badge">${m.difficulte}</span>
           </div>
-          <p style="font-size: 12px; color: var(--text2); margin-bottom: 15px;">${m.description || ''}</p>
+          <p style="font-size: 12px; color: var(--text2); margin-bottom: 15px; min-height: 30px;">${m.description || ''}</p>
           <div class="slots-section">
             <div style="font-size: 9px; color: var(--gold); text-transform: uppercase; margin-bottom: 8px;">Effectif : ${insc.length}/${maxTotal}</div>
             ${slots}
           </div>
         </div>
         <div class="card-footer">
-          ${isFull ? '<div style="color: var(--green); text-align: center; font-size: 12px; font-weight: bold;">UNITÉ DÉPLOYÉE</div>' : 
-          `<button class="btn-inscrire" onclick="ouvrirInscription('${m.id}')">Postuler</button>`}
-          ${isAdmin ? `<button onclick="deleteMission('${m.id}')" style="background:none; border:none; color:var(--red); font-size:10px; width:100%; margin-top:10px; cursor:pointer;">Annuler</button>` : ''}
+          ${isFull ? '<div style="color: var(--green); text-align: center; font-size: 12px; font-weight: bold; letter-spacing:1px;">UNITÉ DÉPLOYÉE</div>' : 
+          `<button class="btn-inscrire" onclick="ouvrirInscription('${m.id}')">Se porter volontaire</button>`}
+          ${isAdmin ? `<button onclick="deleteMission('${m.id}')" style="background:none; border:none; color:var(--red); font-size:10px; width:100%; margin-top:10px; cursor:pointer;">Annuler l'ordre</button>` : ''}
         </div>
       </div>
     `;
   }).join('');
 }
 
-function ouvrirInscription(id) { currentMissionId = id; document.getElementById('modal-inscription').classList.add('open'); }
+function ouvrirInscription(id) {
+  if(!currentUserName) return initSession();
+  currentMissionId = id;
+  document.getElementById('display-user-name').textContent = currentUserName;
+  document.getElementById('modal-inscription').classList.add('open');
+}
+
 function closeModal() { document.getElementById('modal-inscription').classList.remove('open'); }
 
 async function confirmerInscription() {
-  const pseudo = document.getElementById('insc-pseudo').value.trim();
   const role = document.getElementById('insc-role').value;
-  if(!pseudo) return;
-  const { error } = await db.from('inscriptions').insert({ mission_id: currentMissionId, pseudo, role });
-  if(!error) { closeModal(); loadData(); }
+  
+  // Anti-doublon local
+  const dejaInscrit = inscriptions.some(i => i.mission_id === currentMissionId && i.pseudo.toLowerCase() === currentUserName.toLowerCase());
+  if (dejaInscrit) {
+    showToast("Déjà inscrit à cet ordre !", "error");
+    closeModal();
+    return;
+  }
+
+  const { error } = await db.from('inscriptions').insert({ 
+    mission_id: currentMissionId, 
+    pseudo: currentUserName, 
+    role: role 
+  });
+
+  if(!error) { closeModal(); loadData(); showToast("Ordre d'affectation reçu."); }
+  else { showToast("Erreur d'affectation", "error"); }
 }
 
 async function createMission() {
   const titre = document.getElementById('m-titre').value.trim();
   const description = document.getElementById('m-desc').value.trim();
   const difficulte = document.getElementById('m-diff').value;
-  // parseInt transforme le texte "3" en nombre 3
   const max_eleves = parseInt(document.getElementById('m-eleves').value);
 
-  if(!titre) return;
+  if(!titre) return showToast("Titre requis", "error");
 
-  const { error } = await db.from('missions').insert({ 
-    titre, 
-    description, 
-    difficulte, 
-    max_eleves // Maintenant c'est un vrai nombre !
-  });
-
-  if(error) {
-    alert("Erreur : " + error.message);
+  const { error } = await db.from('missions').insert({ titre, description, difficulte, max_eleves });
+  if(!error) { 
+    loadData(); 
+    document.getElementById('m-titre').value=''; 
+    document.getElementById('m-desc').value='';
+    showToast("Nouvel ordre publié");
   } else {
-    loadData();
-    document.getElementById('m-titre').value = '';
-    document.getElementById('m-desc').value = '';
+    showToast("Erreur de publication", "error");
   }
 }
 
 async function deleteMission(id) {
-  if(!confirm("Supprimer ?")) return;
+  if(!confirm("Annuler définitivement cet ordre ?")) return;
   await db.from('inscriptions').delete().eq('mission_id', id);
   await db.from('missions').delete().eq('id', id);
   loadData();
@@ -302,10 +335,22 @@ function checkPwd() {
     document.getElementById('admin-panel').classList.add('open');
     document.getElementById('admin-btn').textContent = "Admin ✓";
     renderMissions();
-  }
+  } else { showToast("Accès refusé", "error"); }
 }
 
-loadData();
+function showToast(m, type="success") {
+  const t = document.getElementById('toast');
+  t.textContent = m;
+  t.className = "toast show " + type;
+  setTimeout(() => t.className = "toast", 3000);
+}
+
+// Lancement
+initSession();
+
+// Realtime
+db.channel('jjk-live').on('postgres_changes', { event: '*', schema: 'public', table: 'missions' }, loadData)
+.on('postgres_changes', { event: '*', schema: 'public', table: 'inscriptions' }, loadData).subscribe();
 </script>
 </body>
 </html>
