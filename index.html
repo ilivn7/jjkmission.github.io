@@ -54,6 +54,7 @@
     display: flex;
     align-items: center;
     justify-content: flex-end;
+    gap: 10px;
   }
 
   .header-title-container { position: absolute; left: 2rem; }
@@ -65,16 +66,22 @@
     text-transform: uppercase;
   }
 
-  #admin-btn {
+  .nav-btn {
     font-family: var(--font-title);
     font-size: 11px;
     letter-spacing: 2px;
-    color: var(--gold);
     background: transparent;
-    border: 1px solid var(--border-gold);
     padding: 8px 16px;
     cursor: pointer;
     transition: 0.3s;
+    border-radius: 2px;
+  }
+
+  #admin-btn { border: 1px solid var(--border-gold); color: var(--gold); }
+  #logout-admin-nav { 
+    border: 1px solid var(--red); 
+    color: var(--red); 
+    display: none; /* Caché par défaut */
   }
 
   main { max-width: 1200px; margin: 0 auto; padding: 2.5rem 2rem; }
@@ -110,7 +117,18 @@
 
   .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 1000; align-items: center; justify-content: center; }
   .modal-overlay.open { display: flex; }
-  .modal { background: var(--bg2); border: 1px solid var(--border-gold); padding: 2rem; width: 400px; }
+  .modal { background: var(--bg2); border: 1px solid var(--border-gold); padding: 2rem; width: 400px; position: relative; }
+
+  .close-modal {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    color: var(--text2);
+    cursor: pointer;
+    line-height: 1;
+  }
+  .close-modal:hover { color: var(--gold); }
 
   input, textarea, select { width: 100%; background: var(--bg3); border: 1px solid var(--border); color: #fff; padding: 12px; margin-bottom: 10px; outline: none; }
   .toast { position: fixed; bottom: 20px; right: 20px; padding: 15px; background: var(--bg2); border: 1px solid var(--gold); opacity: 0; transition: 0.3s; z-index: 2000; }
@@ -123,7 +141,8 @@
   <div class="header-title-container">
     <h1>Registre des Missions</h1>
   </div>
-  <button id="admin-btn" onclick="openPwd()">Admin</button>
+  <button id="logout-admin-nav" class="nav-btn" onclick="logoutAdmin()">Quitter Admin</button>
+  <button id="admin-btn" class="nav-btn" onclick="openPwd()">Admin</button>
 </header>
 
 <div id="admin-panel">
@@ -165,6 +184,7 @@
 
 <div class="modal-overlay" id="modal-inscription">
   <div class="modal">
+    <span class="close-modal" onclick="closeModal()">&times;</span>
     <h3 style="font-family: var(--font-title); color: var(--gold); text-align: center; margin-bottom: 10px;">Affectation</h3>
     <p style="text-align: center; font-size: 13px; margin-bottom: 20px;">Exorciste : <span id="display-user-name" style="color: #fff; font-weight: bold;"></span></p>
     <label style="font-size: 10px; color: var(--text2); text-transform: uppercase;">Rôle</label>
@@ -172,15 +192,13 @@
       <option value="Élève">Élève</option>
       <option value="Professeur">Professeur / Encadrant</option>
     </select>
-    <div style="display: flex; gap: 10px; margin-top: 10px;">
-      <button onclick="closeModal()" style="flex:1; background:none; border:1px solid var(--border); color:var(--text2); cursor: pointer;">Annuler</button>
-      <button onclick="confirmerInscription()" style="flex:1; background:var(--gold); color:#000; border:none; font-weight:bold; cursor: pointer;">Confirmer</button>
-    </div>
+    <button onclick="confirmerInscription()" style="width:100%; padding: 12px; background: var(--gold); color: #000; border: none; font-weight: bold; cursor: pointer;">Confirmer</button>
   </div>
 </div>
 
 <div id="pwd-overlay" class="modal-overlay">
   <div class="modal">
+    <span class="close-modal" onclick="closePwd()">&times;</span>
     <h3 style="font-family: var(--font-title); text-align:center; margin-bottom:15px;">Identification Admin</h3>
     <input type="password" id="pwd-input" placeholder="Mot de passe" />
     <button onclick="checkPwd()" style="width:100%; padding:10px; background:var(--gold); border:none; font-weight:bold; cursor: pointer;">Entrer</button>
@@ -202,14 +220,6 @@ let inscriptions = [];
 let currentMissionId = null;
 let isAdmin = false;
 let currentUserName = localStorage.getItem('jjk_user_name');
-
-// --- SESSION LOGIC ---
-async function initSession() {
-  if (!currentUserName) {
-    document.getElementById('modal-welcome').classList.add('open');
-  }
-  loadData();
-}
 
 function saveUserSession() {
   const name = document.getElementById('user-session-name').value.trim();
@@ -272,33 +282,42 @@ function renderMissions() {
 }
 
 function ouvrirInscription(id) {
-  if(!currentUserName) return initSession();
+  if(!currentUserName) { document.getElementById('modal-welcome').classList.add('open'); return; }
   currentMissionId = id;
   document.getElementById('display-user-name').textContent = currentUserName;
   document.getElementById('modal-inscription').classList.add('open');
 }
 
 function closeModal() { document.getElementById('modal-inscription').classList.remove('open'); }
+function openPwd() { if (!isAdmin) document.getElementById('pwd-overlay').classList.add('open'); }
+function closePwd() { document.getElementById('pwd-overlay').classList.remove('open'); }
+
+function checkPwd() {
+  if(document.getElementById('pwd-input').value === ADMIN_PWD) {
+    isAdmin = true;
+    closePwd();
+    document.getElementById('admin-panel').classList.add('open');
+    document.getElementById('admin-btn').textContent = "Admin ✓";
+    document.getElementById('logout-admin-nav').style.display = 'block'; // Affiche le bouton Quitter
+    renderMissions();
+  } else { showToast("Accès refusé", "error"); }
+}
+
+function logoutAdmin() {
+  isAdmin = false;
+  document.getElementById('admin-panel').classList.remove('open');
+  document.getElementById('admin-btn').textContent = "Admin";
+  document.getElementById('logout-admin-nav').style.display = 'none'; // Cache le bouton Quitter
+  renderMissions();
+  showToast("Session admin terminée");
+}
 
 async function confirmerInscription() {
   const role = document.getElementById('insc-role').value;
-  
-  // Anti-doublon local
   const dejaInscrit = inscriptions.some(i => i.mission_id === currentMissionId && i.pseudo.toLowerCase() === currentUserName.toLowerCase());
-  if (dejaInscrit) {
-    showToast("Déjà inscrit à cet ordre !", "error");
-    closeModal();
-    return;
-  }
-
-  const { error } = await db.from('inscriptions').insert({ 
-    mission_id: currentMissionId, 
-    pseudo: currentUserName, 
-    role: role 
-  });
-
+  if (dejaInscrit) { showToast("Déjà inscrit à cet ordre !", "error"); closeModal(); return; }
+  const { error } = await db.from('inscriptions').insert({ mission_id: currentMissionId, pseudo: currentUserName, role: role });
   if(!error) { closeModal(); loadData(); showToast("Ordre d'affectation reçu."); }
-  else { showToast("Erreur d'affectation", "error"); }
 }
 
 async function createMission() {
@@ -306,36 +325,16 @@ async function createMission() {
   const description = document.getElementById('m-desc').value.trim();
   const difficulte = document.getElementById('m-diff').value;
   const max_eleves = parseInt(document.getElementById('m-eleves').value);
-
   if(!titre) return showToast("Titre requis", "error");
-
   const { error } = await db.from('missions').insert({ titre, description, difficulte, max_eleves });
-  if(!error) { 
-    loadData(); 
-    document.getElementById('m-titre').value=''; 
-    document.getElementById('m-desc').value='';
-    showToast("Nouvel ordre publié");
-  } else {
-    showToast("Erreur de publication", "error");
-  }
+  if(!error) { loadData(); document.getElementById('m-titre').value=''; document.getElementById('m-desc').value=''; showToast("Nouvel ordre publié"); }
 }
 
 async function deleteMission(id) {
-  if(!confirm("Annuler définitivement cet ordre ?")) return;
+  if(!confirm("Annuler cet ordre ?")) return;
   await db.from('inscriptions').delete().eq('mission_id', id);
   await db.from('missions').delete().eq('id', id);
   loadData();
-}
-
-function openPwd() { document.getElementById('pwd-overlay').classList.add('open'); }
-function checkPwd() {
-  if(document.getElementById('pwd-input').value === ADMIN_PWD) {
-    isAdmin = true;
-    document.getElementById('pwd-overlay').classList.remove('open');
-    document.getElementById('admin-panel').classList.add('open');
-    document.getElementById('admin-btn').textContent = "Admin ✓";
-    renderMissions();
-  } else { showToast("Accès refusé", "error"); }
 }
 
 function showToast(m, type="success") {
@@ -345,10 +344,9 @@ function showToast(m, type="success") {
   setTimeout(() => t.className = "toast", 3000);
 }
 
-// Lancement
-initSession();
+if (!currentUserName) { document.getElementById('modal-welcome').classList.add('open'); }
+loadData();
 
-// Realtime
 db.channel('jjk-live').on('postgres_changes', { event: '*', schema: 'public', table: 'missions' }, loadData)
 .on('postgres_changes', { event: '*', schema: 'public', table: 'inscriptions' }, loadData).subscribe();
 </script>
