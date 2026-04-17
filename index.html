@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tableau des Missions — JJK RP</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0a0a0f;
+    --bg2: #12121a;
+    --bg3: #1a1a26;
+    --border: rgba(255,255,255,0.08);
+    --text: #e8e8f0;
+    --text2: #9090a8;
+    --accent: #7c6af7;
+    --accent2: #a594ff;
+    --danger: #e05454;
+    --success: #3db87a;
+    --gold: #f0b429;
+    --easy: #3db87a;
+    --medium: #f0b429;
+    --hard: #e05454;
+    --special: #a594ff;
+  }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh; }
+
+  header {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 1.2rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .logo { display: flex; align-items: center; gap: 12px; }
+  .logo-icon { width: 36px; height: 36px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; color: white; }
+  .logo h1 { font-size: 18px; font-weight: 600; }
+  .logo span { font-size: 13px; color: var(--text2); }
+
+  #admin-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text2);
+    padding: 6px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s;
+  }
+  #admin-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  main { max-width: 1100px; margin: 0 auto; padding: 2rem; }
+
+  .missions-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+  }
+  .missions-header h2 { font-size: 22px; font-weight: 600; }
+  .count-badge {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 13px;
+  }
+
+  .missions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1rem;
+  }
+
+  .mission-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem;
+    transition: border-color 0.2s;
+  }
+  .mission-card:hover { border-color: rgba(124,106,247,0.3); }
+
+  .card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+  }
+  .mission-title { font-size: 16px; font-weight: 600; }
+  .diff-badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 20px;
+    flex-shrink: 0;
+    margin-left: 8px;
+  }
+  .diff-Facile { background: rgba(61,184,122,0.15); color: var(--easy); }
+  .diff-Moyen { background: rgba(240,180,41,0.15); color: var(--medium); }
+  .diff-Difficile { background: rgba(224,84,84,0.15); color: var(--danger); }
+  .diff-Spéciale { background: rgba(165,148,255,0.15); color: var(--special); }
+
+  .mission-desc {
+    font-size: 13px;
+    color: var(--text2);
+    margin-bottom: 1rem;
+    line-height: 1.5;
+    min-height: 40px;
+  }
+
+  .slots-section { margin-bottom: 1rem; }
+  .slots-label {
+    font-size: 12px;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+  }
+  .slot {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    margin-bottom: 4px;
+    font-size: 13px;
+    border: 1px solid var(--border);
+    background: var(--bg3);
+  }
+  .slot-role {
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    flex-shrink: 0;
+    font-weight: 600;
+  }
+  .slot-prof { background: rgba(240,180,41,0.15); color: var(--gold); }
+  .slot-eleve { background: rgba(124,106,247,0.15); color: var(--accent2); }
+  .slot-pseudo { color: var(--text); flex: 1; }
+  .slot-empty { color: var(--text2); flex: 1; font-style: italic; }
+
+  .card-actions { display: flex; gap: 8px; }
+  .btn-inscrire {
+    flex: 1;
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    transition: opacity 0.2s;
+  }
+  .btn-inscrire:hover { opacity: 0.85; }
+  .btn-inscrire:disabled { background: var(--bg3); color: var(--text2); cursor: not-allowed; border: 1px solid var(--border); }
+
+  .mission-full {
+    text-align: center;
+    font-size: 12px;
+    color: var(--success);
+    font-weight: 600;
+    padding: 6px;
+    background: rgba(61,184,122,0.08);
+    border-radius: 6px;
+    border: 1px solid rgba(61,184,122,0.2);
+    flex: 1;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--text2);
+    grid-column: 1 / -1;
+  }
+  .empty-state p { font-size: 15px; margin-top: 8px; }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.75rem;
+    width: 90%;
+    max-width: 420px;
+  }
+  .modal h3 { font-size: 17px; font-weight: 600; margin-bottom: 1.25rem; }
+  .modal label { font-size: 13px; color: var(--text2); display: block; margin-bottom: 5px; }
+  .modal input, .modal select, .modal textarea {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 9px 12px;
+    border-radius: 7px;
+    font-size: 14px;
+    margin-bottom: 1rem;
+    font-family: inherit;
+  }
+  .modal textarea { resize: vertical; min-height: 80px; }
+  .modal input:focus, .modal select:focus, .modal textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 0.5rem; }
+  .btn-cancel {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text2);
+    padding: 8px 16px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  .btn-confirm {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .btn-confirm:hover { opacity: 0.85; }
+
+  /* ADMIN PANEL */
+  #admin-panel {
+    display: none;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 1.5rem 2rem;
+  }
+  #admin-panel.open { display: block; }
+  #admin-panel h3 { font-size: 16px; font-weight: 600; margin-bottom: 1rem; }
+  .admin-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .admin-form input, .admin-form select, .admin-form textarea {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 12px;
+    border-radius: 7px;
+    font-size: 13px;
+    font-family: inherit;
+  }
+  .admin-form textarea { resize: vertical; min-height: 70px; }
+  .admin-form input:focus, .admin-form select:focus, .admin-form textarea:focus {
+    outline: none; border-color: var(--accent);
+  }
+  .admin-form .full { grid-column: 1 / -1; }
+  .btn-add-mission {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 9px 18px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .btn-delete {
+    background: transparent;
+    border: 1px solid rgba(224,84,84,0.3);
+    color: var(--danger);
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 12px;
+    flex-shrink: 0;
+  }
+  .btn-delete:hover { background: rgba(224,84,84,0.1); }
+
+  /* PASSWORD */
+  #pwd-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+  }
+  #pwd-overlay.open { display: flex; }
+  #pwd-box {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.75rem;
+    width: 320px;
+    text-align: center;
+  }
+  #pwd-box h3 { margin-bottom: 1rem; font-size: 16px; }
+  #pwd-box input {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 9px 12px;
+    border-radius: 7px;
+    font-size: 14px;
+    margin-bottom: 10px;
+    text-align: center;
+    letter-spacing: 3px;
+    font-family: inherit;
+  }
+  #pwd-box input:focus { outline: none; border-color: var(--accent); }
+  #pwd-error { color: var(--danger); font-size: 13px; margin-bottom: 8px; display: none; }
+
+  .toast {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 14px;
+    z-index: 999;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  .toast.success { border-color: rgba(61,184,122,0.4); }
+  .toast.error { border-color: rgba(224,84,84,0.4); }
+</style>
+</head>
+<body>
+
+<div id="pwd-overlay">
+  <div id="pwd-box">
+    <h3>Accès admin</h3>
+    <input type="password" id="pwd-input" placeholder="Mot de passe" />
+    <p id="pwd-error">Mot de passe incorrect</p>
+    <button class="btn-confirm" onclick="checkPwd()">Entrer</button>
+    <br><br>
+    <button class="btn-cancel" onclick="closePwd()">Annuler</button>
+  </div>
+</div>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">呪</div>
+    <div>
+      <h1>Tableau des Missions</h1>
+      <span>Jujutsu Kaisen RP</span>
+    </div>
+  </div>
+  <button id="admin-btn" onclick="openPwd()">⚙ Admin</button>
+</header>
+
+<div id="admin-panel">
+  <h3>Créer une mission</h3>
+  <div class="admin-form">
+    <input type="text" id="m-titre" placeholder="Titre de la mission" class="full" />
+    <textarea id="m-desc" placeholder="Description (optionnel)" class="full"></textarea>
+    <select id="m-diff">
+      <option value="Facile">Facile</option>
+      <option value="Moyen" selected>Moyen</option>
+      <option value="Difficile">Difficile</option>
+      <option value="Spéciale">Spéciale</option>
+    </select>
+    <select id="m-eleves">
+      <option value="3">3 élèves</option>
+      <option value="4">4 élèves</option>
+    </select>
+    <div class="full" style="display:flex;justify-content:flex-end;">
+      <button class="btn-add-mission" onclick="createMission()">+ Ajouter la mission</button>
+    </div>
+  </div>
+</div>
+
+<main>
+  <div class="missions-header">
+    <h2>Missions disponibles</h2>
+    <span class="count-badge" id="mission-count">0 missions</span>
+  </div>
+  <div class="missions-grid" id="missions-grid">
+    <div class="empty-state">
+      <p>Chargement des missions...</p>
+    </div>
+  </div>
+</main>
+
+<!-- Modal inscription -->
+<div class="modal-overlay" id="modal-inscription">
+  <div class="modal">
+    <h3>S'inscrire à la mission</h3>
+    <label>Ton pseudo</label>
+    <input type="text" id="insc-pseudo" placeholder="Ex: Gojo Satoru" />
+    <label>Ton rôle</label>
+    <select id="insc-role">
+      <option value="Élève">Élève</option>
+      <option value="Professeur">Professeur</option>
+    </select>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Annuler</button>
+      <button class="btn-confirm" onclick="confirmerInscription()">S'inscrire</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SUPABASE_URL = 'https://kabhmfkzcxqommwqwtr.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImthYmhtbWZremN4cW9tbXdxd3RyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0MjgwMTcsImV4cCI6MjA5MjAwNDAxN30.IJ96fGC6g22j3hD_2n1zrQbWNXti8u3SHyv3tYvYYe0';
+const ADMIN_PWD = 'jjk2025';
+
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let missions = [];
+let inscriptions = [];
+let currentMissionId = null;
+let isAdmin = false;
+
+async function loadData() {
+  const [{ data: m }, { data: i }] = await Promise.all([
+    db.from('missions').select('*').order('created_at', { ascending: false }),
+    db.from('inscriptions').select('*')
+  ]);
+  missions = m || [];
+  inscriptions = i || [];
+  renderMissions();
+}
+
+function getInscriptions(missionId) {
+  return inscriptions.filter(i => i.mission_id === missionId);
+}
+
+function renderMissions() {
+  const grid = document.getElementById('missions-grid');
+  const count = document.getElementById('mission-count');
+  count.textContent = missions.length + ' mission' + (missions.length > 1 ? 's' : '');
+
+  if (missions.length === 0) {
+    grid.innerHTML = '<div class="empty-state"><p>Aucune mission disponible pour le moment.</p></div>';
+    return;
+  }
+
+  grid.innerHTML = missions.map(m => {
+    const insc = getInscriptions(m.id);
+    const prof = insc.find(i => i.role === 'Professeur');
+    const eleves = insc.filter(i => i.role === 'Élève');
+    const totalPlaces = 1 + m.max_eleves;
+    const placesRestantes = totalPlaces - insc.length;
+    const isFull = placesRestantes <= 0;
+
+    let slotsHtml = '';
+    // Slot prof
+    if (prof) {
+      slotsHtml += `<div class="slot"><span class="slot-role slot-prof">Prof</span><span class="slot-pseudo">${prof.pseudo}</span></div>`;
+    } else {
+      slotsHtml += `<div class="slot"><span class="slot-role slot-prof">Prof</span><span class="slot-empty">Libre</span></div>`;
+    }
+    // Slots élèves
+    for (let i = 0; i < m.max_eleves; i++) {
+      if (eleves[i]) {
+        slotsHtml += `<div class="slot"><span class="slot-role slot-eleve">Élève</span><span class="slot-pseudo">${eleves[i].pseudo}</span></div>`;
+      } else {
+        slotsHtml += `<div class="slot"><span class="slot-role slot-eleve">Élève</span><span class="slot-empty">Libre</span></div>`;
+      }
+    }
+
+    const actionBtn = isFull
+      ? `<div class="mission-full">Escouade complète ✓</div>`
+      : `<button class="btn-inscrire" onclick="ouvrirInscription('${m.id}')">S'inscrire</button>`;
+
+    const deleteBtn = isAdmin
+      ? `<button class="btn-delete" onclick="deleteMission('${m.id}')">Supprimer</button>`
+      : '';
+
+    return `
+      <div class="mission-card">
+        <div class="card-top">
+          <span class="mission-title">${m.titre}</span>
+          <span class="diff-badge diff-${m.difficulte}">${m.difficulte}</span>
+        </div>
+        <p class="mission-desc">${m.description || 'Aucune description.'}</p>
+        <div class="slots-section">
+          <div class="slots-label">Escouade (${insc.length}/${totalPlaces})</div>
+          ${slotsHtml}
+        </div>
+        <div class="card-actions">
+          ${actionBtn}
+          ${deleteBtn}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function ouvrirInscription(missionId) {
+  currentMissionId = missionId;
+  document.getElementById('insc-pseudo').value = '';
+  document.getElementById('modal-inscription').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modal-inscription').classList.remove('open');
+  currentMissionId = null;
+}
+
+async function confirmerInscription() {
+  const pseudo = document.getElementById('insc-pseudo').value.trim();
+  const role = document.getElementById('insc-role').value;
+  if (!pseudo) { showToast('Entre ton pseudo !', 'error'); return; }
+
+  const insc = getInscriptions(currentMissionId);
+  const mission = missions.find(m => m.id === currentMissionId);
+  const total = 1 + mission.max_eleves;
+  if (insc.length >= total) { showToast('Mission déjà complète !', 'error'); return; }
+  if (role === 'Professeur' && insc.find(i => i.role === 'Professeur')) {
+    showToast('Il y a déjà un professeur inscrit !', 'error'); return;
+  }
+  if (role === 'Élève' && insc.filter(i => i.role === 'Élève').length >= mission.max_eleves) {
+    showToast('Plus de place pour les élèves !', 'error'); return;
+  }
+
+  const { error } = await db.from('inscriptions').insert({ mission_id: currentMissionId, pseudo, role });
+  if (error) { showToast('Erreur lors de l\'inscription', 'error'); return; }
+
+  closeModal();
+  showToast('Inscription confirmée !', 'success');
+  await loadData();
+}
+
+async function createMission() {
+  const titre = document.getElementById('m-titre').value.trim();
+  const description = document.getElementById('m-desc').value.trim();
+  const difficulte = document.getElementById('m-diff').value;
+  const max_eleves = parseInt(document.getElementById('m-eleves').value);
+  if (!titre) { showToast('Entre un titre !', 'error'); return; }
+
+  const { error } = await db.from('missions').insert({ titre, description, difficulte, max_eleves });
+  if (error) { showToast('Erreur création mission', 'error'); return; }
+
+  document.getElementById('m-titre').value = '';
+  document.getElementById('m-desc').value = '';
+  showToast('Mission créée !', 'success');
+  await loadData();
+}
+
+async function deleteMission(id) {
+  if (!confirm('Supprimer cette mission ?')) return;
+  await db.from('missions').delete().eq('id', id);
+  showToast('Mission supprimée', 'success');
+  await loadData();
+}
+
+function openPwd() { document.getElementById('pwd-overlay').classList.add('open'); }
+function closePwd() { document.getElementById('pwd-overlay').classList.remove('open'); document.getElementById('pwd-error').style.display = 'none'; }
+
+function checkPwd() {
+  const val = document.getElementById('pwd-input').value;
+  if (val === ADMIN_PWD) {
+    isAdmin = true;
+    closePwd();
+    document.getElementById('admin-panel').classList.add('open');
+    document.getElementById('admin-btn').textContent = '✓ Admin';
+    document.getElementById('admin-btn').style.color = 'var(--success)';
+    renderMissions();
+  } else {
+    document.getElementById('pwd-error').style.display = 'block';
+  }
+}
+
+document.getElementById('pwd-input').addEventListener('keydown', e => { if (e.key === 'Enter') checkPwd(); });
+
+function showToast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + type;
+  setTimeout(() => { t.className = 'toast'; }, 3000);
+}
+
+loadData();
+
+// Realtime updates
+db.channel('missions-changes')
+  .on('postgres_changes', { event: '*', schema: 'public', table: 'missions' }, loadData)
+  .on('postgres_changes', { event: '*', schema: 'public', table: 'inscriptions' }, loadData)
+  .subscribe();
+</script>
+</body>
+</html>
