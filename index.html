@@ -263,12 +263,28 @@ async function confirmerInscription() {
 }
 
 async function createMission() {
-  const titre = document.getElementById('m-titre').value;
-  const description = document.getElementById('m-desc').value;
+  const titre = document.getElementById('m-titre').value.trim();
+  const description = document.getElementById('m-desc').value.trim();
   const difficulte = document.getElementById('m-diff').value;
-  const max_eleves = document.getElementById('m-eleves').value;
-  const { error } = await db.from('missions').insert({ titre, description, difficulte, max_eleves });
-  if(!error) { loadData(); document.getElementById('m-titre').value=''; document.getElementById('m-desc').value=''; }
+  // parseInt transforme le texte "3" en nombre 3
+  const max_eleves = parseInt(document.getElementById('m-eleves').value);
+
+  if(!titre) return;
+
+  const { error } = await db.from('missions').insert({ 
+    titre, 
+    description, 
+    difficulte, 
+    max_eleves // Maintenant c'est un vrai nombre !
+  });
+
+  if(error) {
+    alert("Erreur : " + error.message);
+  } else {
+    loadData();
+    document.getElementById('m-titre').value = '';
+    document.getElementById('m-desc').value = '';
+  }
 }
 
 async function deleteMission(id) {
