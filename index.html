@@ -7,28 +7,40 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
+  
   :root {
-    --bg: #0a0a0f;
-    --bg2: #12121a;
-    --bg3: #1a1a26;
-    --border: rgba(255,255,255,0.08);
+    --bg: #0a0a0e; /* Noir profond */
+    --bg2: #12121c; /* Bleu nuit Uniforme */
+    --bg3: #1a1a26; 
+    --border: rgba(179, 139, 77, 0.2); /* Bordure marron léger */
     --text: #e8e8f0;
-    --text2: #9090a8;
-    --accent: #7c6af7;
-    --accent2: #a594ff;
-    --danger: #e05454;
-    --success: #3db87a;
-    --gold: #f0b429;
+    --text2: #8a8aa3;
+    --accent: #3a5ccc; /* Bleu Énergie Occulte */
+    --accent2: #7c6af7;
+    --danger: #9c2b2b;
+    --success: #2d8a57;
+    --gold: #b38b4d; /* Marron doré / Cuir des sceaux */
+    
     --easy: #3db87a;
-    --medium: #f0b429;
-    --hard: #e05454;
-    --special: #a594ff;
+    --medium: #b38b4d; 
+    --hard: #9c2b2b;
+    --special: #7c6af7;
   }
-  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh; }
+
+  body { 
+    background: var(--bg); 
+    /* Effet de texture occulte en fond */
+    background-image: 
+        radial-gradient(circle at 50% 50%, rgba(58, 92, 204, 0.03) 0%, transparent 80%),
+        url('https://www.transparenttextures.com/patterns/dark-matter.png');
+    color: var(--text); 
+    font-family: 'Segoe UI', system-ui, sans-serif; 
+    min-height: 100vh; 
+  }
 
   header {
     background: var(--bg2);
-    border-bottom: 1px solid var(--border);
+    border-bottom: 2px solid var(--gold); /* Ligne marron cuir sous le header */
     padding: 1.2rem 2rem;
     display: flex;
     align-items: center;
@@ -36,316 +48,108 @@
     position: sticky;
     top: 0;
     z-index: 10;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
   }
-  .logo { display: flex; align-items: center; gap: 12px; }
-  .logo-icon { width: 36px; height: 36px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; color: white; }
-  .logo h1 { font-size: 18px; font-weight: 600; }
-  .logo span { font-size: 13px; color: var(--text2); }
+
+  .logo-icon { 
+    width: 36px; 
+    height: 36px; 
+    background: linear-gradient(135deg, var(--gold), #5d4624); /* Dégradé marron */
+    border-radius: 4px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    font-weight: 700; 
+    font-size: 18px; 
+    color: #fff;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,255,255,0.2);
+  }
 
   #admin-btn {
     background: transparent;
     border: 1px solid var(--border);
-    color: var(--text2);
+    color: var(--gold);
     padding: 6px 14px;
-    border-radius: 6px;
+    border-radius: 4px;
     cursor: pointer;
     font-size: 13px;
-    transition: all 0.2s;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
   }
-  #admin-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  #admin-btn:hover { 
+    border-color: var(--gold); 
+    background: rgba(179, 139, 77, 0.1);
+  }
 
   main { max-width: 1100px; margin: 0 auto; padding: 2rem; }
-
-  .missions-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 1.5rem;
-  }
-  .missions-header h2 { font-size: 22px; font-weight: 600; }
-  .count-badge {
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    color: var(--text2);
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 13px;
-  }
-
-  .missions-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 1rem;
-  }
 
   .mission-card {
     background: var(--bg2);
     border: 1px solid var(--border);
-    border-radius: 12px;
+    border-left: 4px solid var(--gold); /* Rappel cuir sur le côté */
+    border-radius: 8px;
     padding: 1.25rem;
-    transition: border-color 0.2s;
-  }
-  .mission-card:hover { border-color: rgba(124,106,247,0.3); }
-
-  .card-top {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    margin-bottom: 0.75rem;
-  }
-  .mission-title { font-size: 16px; font-weight: 600; }
-  .diff-badge {
-    font-size: 11px;
-    font-weight: 600;
-    padding: 3px 8px;
-    border-radius: 20px;
-    flex-shrink: 0;
-    margin-left: 8px;
-  }
-  .diff-Facile { background: rgba(61,184,122,0.15); color: var(--easy); }
-  .diff-Moyen { background: rgba(240,180,41,0.15); color: var(--medium); }
-  .diff-Difficile { background: rgba(224,84,84,0.15); color: var(--danger); }
-  .diff-Spéciale { background: rgba(165,148,255,0.15); color: var(--special); }
-
-  .mission-desc {
-    font-size: 13px;
-    color: var(--text2);
-    margin-bottom: 1rem;
-    line-height: 1.5;
-    min-height: 40px;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    position: relative;
+    overflow: hidden;
   }
 
-  .slots-section { margin-bottom: 1rem; }
-  .slots-label {
-    font-size: 12px;
-    color: var(--text2);
+  .mission-card:hover { 
+    transform: translateY(-5px);
+    border-color: var(--accent);
+    box-shadow: 0 0 20px rgba(58, 92, 204, 0.2);
+  }
+
+  .mission-title { 
+    font-size: 17px; 
+    font-weight: 600; 
+    color: #fff;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 0.5rem;
+    letter-spacing: 0.5px;
   }
+
+  .diff-badge {
+    font-size: 10px;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 2px;
+    border: 1px solid currentColor;
+  }
+
   .slot {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 10px;
-    border-radius: 6px;
-    margin-bottom: 4px;
-    font-size: 13px;
-    border: 1px solid var(--border);
-    background: var(--bg3);
-  }
-  .slot-role {
-    font-size: 11px;
-    padding: 2px 6px;
+    background: rgba(10, 10, 14, 0.6);
+    border: 1px solid rgba(179, 139, 77, 0.1);
     border-radius: 4px;
-    flex-shrink: 0;
-    font-weight: 600;
+    margin-bottom: 6px;
   }
-  .slot-prof { background: rgba(240,180,41,0.15); color: var(--gold); }
-  .slot-eleve { background: rgba(124,106,247,0.15); color: var(--accent2); }
-  .slot-pseudo { color: var(--text); flex: 1; }
-  .slot-empty { color: var(--text2); flex: 1; font-style: italic; }
 
-  .card-actions { display: flex; gap: 8px; }
+  .slot-prof { background: rgba(179, 139, 77, 0.15); color: var(--gold); }
+  .slot-eleve { background: rgba(58, 92, 204, 0.15); color: var(--accent); }
+
   .btn-inscrire {
-    flex: 1;
-    background: var(--accent);
-    color: white;
-    border: none;
-    padding: 8px 14px;
-    border-radius: 7px;
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: 600;
-    transition: opacity 0.2s;
-  }
-  .btn-inscrire:hover { opacity: 0.85; }
-  .btn-inscrire:disabled { background: var(--bg3); color: var(--text2); cursor: not-allowed; border: 1px solid var(--border); }
-
-  .mission-full {
-    text-align: center;
-    font-size: 12px;
-    color: var(--success);
-    font-weight: 600;
-    padding: 6px;
-    background: rgba(61,184,122,0.08);
-    border-radius: 6px;
-    border: 1px solid rgba(61,184,122,0.2);
-    flex: 1;
+    background: linear-gradient(90deg, #1e3a8a, var(--accent));
+    border-radius: 4px;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 10px rgba(58, 92, 204, 0.3);
   }
 
-  .empty-state {
-    text-align: center;
-    padding: 4rem 2rem;
-    color: var(--text2);
-    grid-column: 1 / -1;
-  }
-  .empty-state p { font-size: 15px; margin-top: 8px; }
-
-  /* MODAL */
-  .modal-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.7);
-    z-index: 100;
-    align-items: center;
-    justify-content: center;
-  }
-  .modal-overlay.open { display: flex; }
+  /* Style des Modals pour coller au thème */
   .modal {
     background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 1.75rem;
-    width: 90%;
-    max-width: 420px;
+    border: 1px solid var(--gold);
+    box-shadow: 0 0 50px rgba(0,0,0,0.8);
   }
-  .modal h3 { font-size: 17px; font-weight: 600; margin-bottom: 1.25rem; }
-  .modal label { font-size: 13px; color: var(--text2); display: block; margin-bottom: 5px; }
-  .modal input, .modal select, .modal textarea {
-    width: 100%;
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    color: var(--text);
-    padding: 9px 12px;
-    border-radius: 7px;
-    font-size: 14px;
-    margin-bottom: 1rem;
-    font-family: inherit;
-  }
-  .modal textarea { resize: vertical; min-height: 80px; }
-  .modal input:focus, .modal select:focus, .modal textarea:focus {
-    outline: none;
-    border-color: var(--accent);
-  }
-  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 0.5rem; }
-  .btn-cancel {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--text2);
-    padding: 8px 16px;
-    border-radius: 7px;
-    cursor: pointer;
-    font-size: 14px;
-  }
+
   .btn-confirm {
-    background: var(--accent);
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 7px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 600;
+    background: var(--gold);
+    color: #221a0f;
   }
-  .btn-confirm:hover { opacity: 0.85; }
-
-  /* ADMIN PANEL */
-  #admin-panel {
-    display: none;
-    background: var(--bg2);
-    border-bottom: 1px solid var(--border);
-    padding: 1.5rem 2rem;
-  }
-  #admin-panel.open { display: block; }
-  #admin-panel h3 { font-size: 16px; font-weight: 600; margin-bottom: 1rem; }
-  .admin-form {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
-  .admin-form input, .admin-form select, .admin-form textarea {
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    color: var(--text);
-    padding: 8px 12px;
-    border-radius: 7px;
-    font-size: 13px;
-    font-family: inherit;
-  }
-  .admin-form textarea { resize: vertical; min-height: 70px; }
-  .admin-form input:focus, .admin-form select:focus, .admin-form textarea:focus {
-    outline: none; border-color: var(--accent);
-  }
-  .admin-form .full { grid-column: 1 / -1; }
-  .btn-add-mission {
-    background: var(--accent);
-    color: white;
-    border: none;
-    padding: 9px 18px;
-    border-radius: 7px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 600;
-  }
-  .btn-delete {
-    background: transparent;
-    border: 1px solid rgba(224,84,84,0.3);
-    color: var(--danger);
-    padding: 5px 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 12px;
-    flex-shrink: 0;
-  }
-  .btn-delete:hover { background: rgba(224,84,84,0.1); }
-
-  /* PASSWORD */
-  #pwd-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.8);
-    z-index: 200;
-    align-items: center;
-    justify-content: center;
-  }
-  #pwd-overlay.open { display: flex; }
-  #pwd-box {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 1.75rem;
-    width: 320px;
-    text-align: center;
-  }
-  #pwd-box h3 { margin-bottom: 1rem; font-size: 16px; }
-  #pwd-box input {
-    width: 100%;
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    color: var(--text);
-    padding: 9px 12px;
-    border-radius: 7px;
-    font-size: 14px;
-    margin-bottom: 10px;
-    text-align: center;
-    letter-spacing: 3px;
-    font-family: inherit;
-  }
-  #pwd-box input:focus { outline: none; border-color: var(--accent); }
-  #pwd-error { color: var(--danger); font-size: 13px; margin-bottom: 8px; display: none; }
-
-  .toast {
-    position: fixed;
-    bottom: 1.5rem;
-    right: 1.5rem;
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    color: var(--text);
-    padding: 10px 18px;
-    border-radius: 8px;
-    font-size: 14px;
-    z-index: 999;
-    opacity: 0;
-    transform: translateY(10px);
-    transition: all 0.3s;
-    pointer-events: none;
-  }
-  .toast.show { opacity: 1; transform: translateY(0); }
-  .toast.success { border-color: rgba(61,184,122,0.4); }
-  .toast.error { border-color: rgba(224,84,84,0.4); }
 </style>
 </head>
 <body>
