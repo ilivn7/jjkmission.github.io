@@ -24,7 +24,6 @@
     --red: #dc2626;
     --green: #16a34a;
 
-    /* Couleurs par Classe */
     --c-classe-4: #16a34a;
     --c-classe-3: #4a7fff;
     --c-classe-2: #c29c52;
@@ -43,45 +42,34 @@
     background-image: radial-gradient(circle at 50% 50%, rgba(58, 92, 204, 0.02) 0%, transparent 80%);
   }
 
-  /* === HEADER === */
+  /* === HEADER ÉPURÉ === */
   header {
     position: sticky;
     top: 0;
     z-index: 100;
-    background: rgba(7,7,13,0.9);
+    background: rgba(7,7,13,0.95);
     backdrop-filter: blur(15px);
     border-bottom: 1px solid var(--border-gold);
     padding: 0 2rem;
     height: 70px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-end; /* Pousse tout vers la droite */
   }
 
-  .header-left { display: flex; align-items: center; gap: 15px; }
-
-  /* SCEAU SVG AU LIEU DE L'IMAGE */
-  .seal-mini {
-    width: 42px;
-    height: 42px;
-    border: 1px solid var(--gold);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(194,156,82,0.05);
-    box-shadow: 0 0 10px rgba(194,156,82,0.2);
+  /* Titre centré ou à gauche selon ta préférence, ici on le laisse respirer */
+  .header-title-container {
+    position: absolute;
+    left: 2rem;
   }
 
-  .header-text h1 {
+  .header-title-container h1 {
     font-family: var(--font-title);
     font-size: 16px;
     color: var(--gold2);
     letter-spacing: 2px;
     text-transform: uppercase;
-    line-height: 1;
   }
-  .header-text span { font-size: 10px; color: var(--text2); letter-spacing: 1px; }
 
   #admin-btn {
     font-family: var(--font-title);
@@ -96,34 +84,16 @@
   }
   #admin-btn:hover { background: rgba(194,156,82,0.1); color: #fff; }
 
-  /* === MISSIONS === */
-  main { max-width: 1200px; margin: 0 auto; padding: 2rem; }
-
-  .section-header {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 2rem;
-  }
+  /* === RESTE DU STYLE === */
+  main { max-width: 1200px; margin: 0 auto; padding: 2.5rem 2rem; }
+  .section-header { display: flex; align-items: center; gap: 15px; margin-bottom: 2rem; }
   .section-title { font-family: var(--font-title); letter-spacing: 4px; text-transform: uppercase; font-size: 12px; color: var(--text2); }
   .divider { flex: 1; height: 1px; background: linear-gradient(90deg, var(--border-gold), transparent); }
 
-  .missions-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-    gap: 20px;
-  }
-
-  .mission-card {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-top: 3px solid var(--card-color, var(--gold));
-    border-radius: 4px;
-    transition: 0.3s;
-  }
+  .missions-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
+  .mission-card { background: var(--bg2); border: 1px solid var(--border); border-top: 3px solid var(--card-color, var(--gold)); border-radius: 4px; transition: 0.3s; }
   .mission-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
 
-  /* Classes Dynamiques */
   .diff-Classe-4 { --card-color: var(--c-classe-4); }
   .diff-Classe-3 { --card-color: var(--c-classe-3); }
   .diff-Classe-2 { --card-color: var(--c-classe-2); }
@@ -133,94 +103,34 @@
   .card-content { padding: 1.5rem; }
   .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
   .mission-title { font-family: var(--font-title); font-size: 15px; color: #fff; letter-spacing: 1px; }
+  .badge { font-family: var(--font-title); font-size: 9px; padding: 4px 10px; border: 1px solid var(--card-color); color: var(--card-color); }
 
-  .badge {
-    font-family: var(--font-title);
-    font-size: 9px;
-    padding: 4px 10px;
-    border: 1px solid var(--card-color);
-    color: var(--card-color);
-    background: rgba(0,0,0,0.3);
-  }
-
-  .slot {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px;
-    background: rgba(255,255,255,0.02);
-    margin-bottom: 5px;
-    font-size: 13px;
-    border: 1px solid var(--border);
-  }
+  .slot { display: flex; align-items: center; gap: 10px; padding: 8px; background: rgba(255,255,255,0.02); margin-bottom: 5px; font-size: 13px; border: 1px solid var(--border); }
   .slot-role { font-size: 9px; text-transform: uppercase; font-weight: bold; padding: 2px 6px; }
   .role-prof { background: rgba(194,156,82,0.15); color: var(--gold); }
   .role-eleve { background: rgba(74,127,255,0.15); color: var(--blue); }
-  .slot-empty { color: var(--text2); font-style: italic; opacity: 0.5; }
 
   .card-footer { padding: 1rem 1.5rem; border-top: 1px solid var(--border); background: rgba(0,0,0,0.2); }
-
-  .btn-inscrire {
-    width: 100%;
-    font-family: var(--font-title);
-    background: transparent;
-    border: 1px solid var(--blue);
-    color: var(--blue);
-    padding: 10px;
-    cursor: pointer;
-    transition: 0.3s;
-    letter-spacing: 1px;
-  }
+  .btn-inscrire { width: 100%; font-family: var(--font-title); background: transparent; border: 1px solid var(--blue); color: var(--blue); padding: 10px; cursor: pointer; transition: 0.3s; }
   .btn-inscrire:hover { background: var(--blue); color: #fff; }
 
-  /* === ADMIN & MODALS === */
   #admin-panel { display: none; background: var(--bg2); padding: 2rem; border-bottom: 1px solid var(--border-gold); }
   #admin-panel.open { display: block; }
 
-  .modal-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.85);
-    backdrop-filter: blur(5px);
-    z-index: 1000;
-    align-items: center;
-    justify-content: center;
-  }
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); z-index: 1000; align-items: center; justify-content: center; }
   .modal-overlay.open { display: flex; }
   .modal { background: var(--bg2); border: 1px solid var(--border-gold); padding: 2rem; width: 400px; }
 
-  input, textarea, select {
-    width: 100%;
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    color: #fff;
-    padding: 12px;
-    margin-bottom: 10px;
-  }
-
-  .toast {
-    position: fixed; bottom: 20px; right: 20px; padding: 15px;
-    background: var(--bg2); border: 1px solid var(--gold); 
-    transform: translateY(100px); transition: 0.3s; z-index: 2000;
-  }
-  .toast.show { transform: translateY(0); opacity: 1; }
+  input, textarea, select { width: 100%; background: var(--bg3); border: 1px solid var(--border); color: #fff; padding: 12px; margin-bottom: 10px; }
+  .toast { position: fixed; bottom: 20px; right: 20px; padding: 15px; background: var(--bg2); border: 1px solid var(--gold); opacity: 0; transition: 0.3s; z-index: 2000; }
+  .toast.show { opacity: 1; transform: translateY(-10px); }
 </style>
 </head>
 <body>
 
 <header>
-  <div class="header-left">
-    <div class="seal-mini">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#c29c52" stroke-width="1.5">
-        <circle cx="12" cy="12" r="10"/>
-        <path d="M12 2l3 9h9l-7 5 3 9-8-6-8 6 3-9-7-5h9z"/>
-      </svg>
-    </div>
-    <div class="header-text">
-      <h1>Registre des Missions</h1>
-      <span>École d'Exorcisme de Tokyo</span>
-    </div>
+  <div class="header-title-container">
+    <h1>Registre des Missions</h1>
   </div>
   <button id="admin-btn" onclick="openPwd()">Accès Admin</button>
 </header>
@@ -228,17 +138,17 @@
 <div id="admin-panel">
   <div class="admin-form">
     <input type="text" id="m-titre" placeholder="Titre de l'ordre..."/>
-    <textarea id="m-desc" placeholder="Détails du fléau ou de la zone..."></textarea>
+    <textarea id="m-desc" placeholder="Détails de la mission..."></textarea>
     <select id="m-diff">
-      <option value="Classe 4">Classe 4 (Faible)</option>
-      <option value="Classe 3">Classe 3 (Standard)</option>
-      <option value="Classe 2">Classe 2 (Sérieux)</option>
-      <option value="Classe 1">Classe 1 (Élite)</option>
-      <option value="Spéciale">Spéciale (Danger Critique)</option>
+      <option value="Classe 4">Classe 4</option>
+      <option value="Classe 3">Classe 3</option>
+      <option value="Classe 2">Classe 2</option>
+      <option value="Classe 1">Classe 1</option>
+      <option value="Spéciale">Spéciale</option>
     </select>
     <select id="m-eleves">
-      <option value="3">Escouade de 3 élèves</option>
-      <option value="4">Escouade de 4 élèves</option>
+      <option value="3">3 élèves</option>
+      <option value="4">4 élèves</option>
     </select>
     <button class="btn-inscrire" style="border-color: var(--gold); color: var(--gold);" onclick="createMission()">Publier l'ordre</button>
   </div>
@@ -246,12 +156,11 @@
 
 <main>
   <div class="section-header">
-    <span class="section-title">Missions de Purification</span>
+    <span class="section-title">Missions en cours</span>
     <div class="divider"></div>
-    <span id="mission-count" style="font-size: 11px; color: var(--gold);">0 ordre</span>
+    <span id="mission-count" style="font-size: 11px; color: var(--gold);">0 mission</span>
   </div>
-  <div class="missions-grid" id="missions-grid">
-    </div>
+  <div class="missions-grid" id="missions-grid"></div>
 </main>
 
 <div class="modal-overlay" id="modal-inscription">
@@ -263,8 +172,8 @@
       <option value="Professeur">Professeur / Encadrant</option>
     </select>
     <div style="display: flex; gap: 10px;">
-      <button onclick="closeModal()" style="flex:1; background:none; border:1px solid var(--border); color:var(--text2); cursor:pointer;">Annuler</button>
-      <button onclick="confirmerInscription()" style="flex:1; background:var(--gold); color:#000; border:none; font-weight:bold; cursor:pointer;">Valider</button>
+      <button onclick="closeModal()" style="flex:1; background:none; border:1px solid var(--border); color:var(--text2);">Annuler</button>
+      <button onclick="confirmerInscription()" style="flex:1; background:var(--gold); color:#000; border:none; font-weight:bold;">Valider</button>
     </div>
   </div>
 </div>
@@ -273,7 +182,7 @@
   <div class="modal">
     <h3 style="font-family: var(--font-title); text-align:center; margin-bottom:15px;">Identification</h3>
     <input type="password" id="pwd-input" placeholder="Mot de passe" />
-    <button onclick="checkPwd()" style="width:100%; padding:10px; background:var(--gold); border:none; font-weight:bold; cursor:pointer;">Vérifier</button>
+    <button onclick="checkPwd()" style="width:100%; padding:10px; background:var(--gold); border:none; font-weight:bold;">Vérifier</button>
   </div>
 </div>
 
@@ -314,9 +223,9 @@ function renderMissions() {
     const isFull = insc.length >= maxTotal;
     const classKey = m.difficulte.replace(/\s/g, '-');
 
-    let slots = `<div class="slot"><span class="slot-role role-prof">Prof</span> <span class="${prof ? '' : 'slot-empty'}">${prof ? prof.pseudo : 'En attente...'}</span></div>`;
+    let slots = `<div class="slot"><span class="slot-role role-prof">Prof</span> <span class="${prof ? '' : 'slot-empty'}">${prof ? prof.pseudo : 'Vacant'}</span></div>`;
     for(let j=0; j<m.max_eleves; j++) {
-      slots += `<div class="slot"><span class="slot-role role-eleve">Élève</span> <span class="${eleves[j] ? '' : 'slot-empty'}">${eleves[j] ? eleves[j].pseudo : 'En attente...'}</span></div>`;
+      slots += `<div class="slot"><span class="slot-role role-eleve">Élève</span> <span class="${eleves[j] ? '' : 'slot-empty'}">${eleves[j] ? eleves[j].pseudo : 'Vacant'}</span></div>`;
     }
 
     return `
@@ -326,16 +235,16 @@ function renderMissions() {
             <span class="mission-title">${m.titre}</span>
             <span class="badge">${m.difficulte}</span>
           </div>
-          <p style="font-size: 12px; color: var(--text2); margin-bottom: 15px; min-height: 30px;">${m.description || ''}</p>
+          <p style="font-size: 12px; color: var(--text2); margin-bottom: 15px;">${m.description || ''}</p>
           <div class="slots-section">
-            <div style="font-size: 9px; color: var(--gold); text-transform: uppercase; margin-bottom: 8px;">Unité d'intervention : ${insc.length}/${maxTotal}</div>
+            <div style="font-size: 9px; color: var(--gold); text-transform: uppercase; margin-bottom: 8px;">Effectif : ${insc.length}/${maxTotal}</div>
             ${slots}
           </div>
         </div>
         <div class="card-footer">
-          ${isFull ? '<div style="color: var(--green); text-align: center; font-size: 12px; font-weight: bold; letter-spacing:1px;">DÉPLOYÉ ✓</div>' : 
+          ${isFull ? '<div style="color: var(--green); text-align: center; font-size: 12px; font-weight: bold;">UNITÉ DÉPLOYÉE</div>' : 
           `<button class="btn-inscrire" onclick="ouvrirInscription('${m.id}')">Postuler</button>`}
-          ${isAdmin ? `<button onclick="deleteMission('${m.id}')" style="background:none; border:none; color:var(--red); font-size:10px; width:100%; margin-top:10px; cursor:pointer; opacity:0.5;">Annuler l'ordre</button>` : ''}
+          ${isAdmin ? `<button onclick="deleteMission('${m.id}')" style="background:none; border:none; color:var(--red); font-size:10px; width:100%; margin-top:10px; cursor:pointer;">Annuler</button>` : ''}
         </div>
       </div>
     `;
@@ -375,7 +284,7 @@ function checkPwd() {
     isAdmin = true;
     document.getElementById('pwd-overlay').classList.remove('open');
     document.getElementById('admin-panel').classList.add('open');
-    document.getElementById('admin-btn').textContent = "Accès Scellé ✓";
+    document.getElementById('admin-btn').textContent = "Admin ✓";
     renderMissions();
   }
 }
